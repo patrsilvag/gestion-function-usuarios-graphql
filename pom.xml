@@ -1,0 +1,350 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.function</groupId>
+
+    <artifactId>gestion-function-usuarios-graphql</artifactId>
+
+    <version>1.0-SNAPSHOT</version>
+
+    <packaging>jar</packaging>
+
+    <name>Gestion Function Usuarios GraphQL</name>
+
+
+    <!-- ========================================== -->
+    <!-- PROPIEDADES                                -->
+    <!-- ========================================== -->
+
+    <properties>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+
+        <java.version>21</java.version>
+
+        <azure.functions.maven.plugin.version>1.40.0</azure.functions.maven.plugin.version>
+
+        <azure.functions.java.library.version>3.2.2</azure.functions.java.library.version>
+
+
+        <!-- ========================================== -->
+        <!-- FUNCTION APP DE AZURE                      -->
+        <!-- ========================================== -->
+
+        <functionAppName>
+            gestion-function-usuarios-graphql
+        </functionAppName>
+
+    </properties>
+
+
+    <!-- ========================================== -->
+    <!-- DEPENDENCIAS                               -->
+    <!-- ========================================== -->
+
+    <dependencies>
+
+
+        <!-- ========================================== -->
+        <!-- AZURE FUNCTIONS                            -->
+        <!-- ========================================== -->
+
+        <dependency>
+            <groupId>com.microsoft.azure.functions</groupId>
+            <artifactId>azure-functions-java-library</artifactId>
+            <version>${azure.functions.java.library.version}</version>
+        </dependency>
+
+
+        <!-- ========================================== -->
+        <!-- GRAPHQL JAVA                               -->
+        <!-- ========================================== -->
+
+        <dependency>
+            <groupId>com.graphql-java</groupId>
+            <artifactId>graphql-java</artifactId>
+            <version>17.3</version>
+        </dependency>
+
+
+        <!-- ========================================== -->
+        <!-- TEST                                      -->
+        <!-- ========================================== -->
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <version>5.4.2</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <version>2.23.4</version>
+            <scope>test</scope>
+        </dependency>
+
+
+        <!-- ========================================== -->
+        <!-- ORACLE JDBC                                -->
+        <!-- ========================================== -->
+
+        <dependency>
+            <groupId>com.oracle.database.jdbc</groupId>
+            <artifactId>ojdbc11</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+
+
+        <!-- ========================================== -->
+        <!-- ORACLE WALLET                              -->
+        <!-- ========================================== -->
+
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>oraclepki</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>osdt_core</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+
+
+        <dependency>
+            <groupId>com.oracle.database.security</groupId>
+            <artifactId>osdt_cert</artifactId>
+            <version>21.9.0.0</version>
+        </dependency>
+
+
+    </dependencies>
+
+
+    <!-- ========================================== -->
+    <!-- BUILD                                      -->
+    <!-- ========================================== -->
+
+    <build>
+
+        <plugins>
+
+
+            <!-- ========================================== -->
+            <!-- COMPILACIÓN JAVA                            -->
+            <!-- ========================================== -->
+
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+
+                <artifactId>maven-compiler-plugin</artifactId>
+
+                <version>3.8.1</version>
+
+                <configuration>
+
+                    <source>${java.version}</source>
+
+                    <target>${java.version}</target>
+
+                    <encoding>${project.build.sourceEncoding}</encoding>
+
+                </configuration>
+
+            </plugin>
+
+
+            <!-- ========================================== -->
+            <!-- COPIAR ORACLE WALLET                        -->
+            <!-- ========================================== -->
+
+            <plugin>
+
+                <groupId>org.apache.maven.plugins</groupId>
+
+                <artifactId>maven-resources-plugin</artifactId>
+
+                <version>3.3.1</version>
+
+
+                <executions>
+
+                    <execution>
+
+                        <id>copy-wallets</id>
+
+                        <phase>prepare-package</phase>
+
+
+                        <goals>
+
+                            <goal>copy-resources</goal>
+
+                        </goals>
+
+
+                        <configuration>
+
+                            <outputDirectory>
+                                ${project.build.directory}/azure-functions/${functionAppName}/wallets
+                            </outputDirectory>
+
+
+                            <resources>
+
+                                <resource>
+
+                                    <directory>
+                                        ${project.basedir}/wallets
+                                    </directory>
+
+                                    <filtering>false</filtering>
+
+                                </resource>
+
+                            </resources>
+
+                        </configuration>
+
+                    </execution>
+
+                </executions>
+
+            </plugin>
+
+
+            <!-- ========================================== -->
+            <!-- AZURE FUNCTIONS MAVEN PLUGIN               -->
+            <!-- ========================================== -->
+
+            <plugin>
+
+                <groupId>com.microsoft.azure</groupId>
+
+                <artifactId>azure-functions-maven-plugin</artifactId>
+
+                <version>${azure.functions.maven.plugin.version}</version>
+
+
+                <configuration>
+
+
+                    <!-- Nombre de la Function App existente -->
+
+                    <appName>${functionAppName}</appName>
+
+
+                    <!-- Resource Group -->
+
+                    <resourceGroup>
+                        gr-psilva-gestion
+                    </resourceGroup>
+
+
+                    <!-- Región -->
+
+                    <region>eastus</region>
+
+
+                    <!-- Plan existente -->
+
+                    <appServicePlanName>
+                        ASP-grpsilvagestion-9104
+                    </appServicePlanName>
+
+
+                    <!-- Runtime -->
+
+                    <runtime>
+
+                        <javaVersion>21</javaVersion>
+
+                    </runtime>
+
+
+                    <!-- Puerto local -->
+
+                    <funcPort>7074</funcPort>
+
+
+                    <!-- Configuración Azure Functions -->
+
+                    <appSettings>
+
+                        <property>
+
+                            <name>FUNCTIONS_EXTENSION_VERSION</name>
+
+                            <value>~4</value>
+
+                        </property>
+
+                    </appSettings>
+
+
+                </configuration>
+
+
+                <executions>
+
+                    <execution>
+
+                        <id>package-functions</id>
+
+                        <goals>
+
+                            <goal>package</goal>
+
+                        </goals>
+
+                    </execution>
+
+                </executions>
+
+
+            </plugin>
+
+
+            <!-- ========================================== -->
+            <!-- MAVEN CLEAN                                 -->
+            <!-- ========================================== -->
+
+            <plugin>
+
+                <artifactId>maven-clean-plugin</artifactId>
+
+                <version>3.1.0</version>
+
+
+                <configuration>
+
+                    <filesets>
+
+                        <fileset>
+
+                            <directory>obj</directory>
+
+                        </fileset>
+
+                    </filesets>
+
+                </configuration>
+
+            </plugin>
+
+
+        </plugins>
+
+    </build>
+
+</project>
