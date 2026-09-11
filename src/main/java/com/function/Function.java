@@ -34,7 +34,7 @@ public class Function {
     @FunctionName("GraphQL")
     public HttpResponseMessage run(
 
-            @HttpTrigger(name = "req", methods = {HttpMethod.POST},
+            @HttpTrigger(name = "req", methods = {HttpMethod.GET},
                     authLevel = AuthorizationLevel.FUNCTION,
                     route = "graphql") HttpRequestMessage<Optional<String>> request,
 
@@ -50,14 +50,14 @@ public class Function {
             // OBTENER CONSULTA GRAPHQL
             // ==========================================
 
-            String query = request.getBody().orElse("");
+            String query = request.getQueryParameters().get("query");
 
 
             // ==========================================
             // VALIDAR CONSULTA
             // ==========================================
 
-            if (query.isBlank()) {
+            if (query == null || query.isBlank()) {
 
                 return request.createResponseBuilder(HttpStatus.BAD_REQUEST)
                         .header("Content-Type", "application/json").body("""
